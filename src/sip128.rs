@@ -18,6 +18,9 @@ use core::mem;
 use core::ptr;
 use core::u64;
 
+use rkyv::Archive;
+use rkyv::Serialize;
+
 /// A 128-bit (2x64) hash output
 #[derive(Debug, Clone, Copy, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -42,14 +45,14 @@ impl From<Hash128> for u128 {
 }
 
 /// An implementation of SipHash128 1-3.
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy, Default, Serialize, Archive)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SipHasher13 {
     hasher: Hasher<Sip13Rounds>,
 }
 
 /// An implementation of SipHash128 2-4.
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy, Default, Serialize, Archive)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SipHasher24 {
     hasher: Hasher<Sip24Rounds>,
@@ -68,7 +71,7 @@ pub struct SipHasher24 {
 #[derive(Debug, Clone, Copy, Default)]
 pub struct SipHasher(SipHasher24);
 
-#[derive(Debug, Copy)]
+#[derive(Debug, Copy, Serialize, Archive)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 struct Hasher<S: Sip> {
     k0: u64,
@@ -80,7 +83,7 @@ struct Hasher<S: Sip> {
     _marker: PhantomData<S>,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Archive)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 struct State {
     // v0, v2 and v1, v3 show up in pairs in the algorithm,
